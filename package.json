@@ -1,7 +1,7 @@
 {
   "name": "LightFlusteredAggregator",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "start": "npm run build:ts && node dist/index.js",
     "build:ts": "tsc -p .tsconfig"
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "discord.js": "^13.3.1",
+    "json-2-csv": "^3.14.4",
     "mongoose": "^6.0.12",
     "wokcommands": "^1.5.3"
   },

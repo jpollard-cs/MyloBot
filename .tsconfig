@@ -9,7 +9,7 @@
     "strictFunctionTypes": true,
     "moduleResolution": "node",
     "sourceMap": true,
-    "rootDir": "",
+    "rootDir": "src",
     "outDir": "dist",
     "esModuleInterop": true,
     "experimentalDecorators": true,

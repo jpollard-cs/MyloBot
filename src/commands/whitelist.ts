@@ -12,7 +12,7 @@ export = {
   slash: 'both',
   requireRoles: true,
   guildOnly: true,
-  testOnly: true,
+  testOnly: false,
 
   callback: async (options: ICallbackObject) => {
     const { args, text, instance, user, guild } = options;

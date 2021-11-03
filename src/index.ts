@@ -20,7 +20,7 @@ client.on('ready', () => {
     commandDir: path.join(__dirname, 'commands'),
     // Allow importing of .ts files if you are using ts-node
     typeScript: false,
-    testServers: [process.env.TEST_SERVER],
+    testServers: [process.env.TEST_GUILD_ID],
     mongoUri,
   });
 });
