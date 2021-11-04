@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const wokcommands_1 = __importDefault(require("wokcommands"));
 const path_1 = __importDefault(require("path"));
+const server_1 = __importDefault(require("./server"));
 const client = new discord_js_1.Client({
     // These intents are recommended for the built in help menu
     intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES, discord_js_1.Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
@@ -25,5 +26,8 @@ client.on('ready', () => {
         mongoUri,
     });
 });
+// hack to keep repl.it process alive
+// see './server.ts' for more info
+(0, server_1.default)();
 client.login(process.env.CLIENT_TOKEN);
 //# sourceMappingURL=index.js.map

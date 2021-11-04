@@ -17,27 +17,33 @@ module.exports = {
     testOnly: false,
     callback: async (options) => {
         const { args, text, instance, user, guild } = options;
-        if (args.length === 0) {
-            return instance.messageHandler.get(guild, 'SYNTAX_ERROR');
-        }
-        if (guild) {
-            if (!instance.isDBConnected()) {
-                return instance.messageHandler.get(guild, 'NO_DATABASE_FOUND');
+        try {
+            if (args.length === 0) {
+                return instance.messageHandler.get(guild, 'SYNTAX_ERROR');
             }
-            await whitelist_model_1.default.findOneAndUpdate({
-                user_id: user.id,
-                guild_id: guild.id
-            }, {
-                user_id: user.id,
-                guild_id: guild.id,
-                address: text
-            }, { upsert: true });
-            const embed = new discord_js_1.MessageEmbed()
-                .setTitle('Whitelist')
-                .setDescription(`Congratulations! your address **${text}** has been added to the whitelist!`);
-            return [embed];
+            if (guild) {
+                if (!instance.isDBConnected()) {
+                    return instance.messageHandler.get(guild, 'NO_DATABASE_FOUND');
+                }
+                await whitelist_model_1.default.findOneAndUpdate({
+                    user_id: user.id,
+                    guild_id: guild.id
+                }, {
+                    user_id: user.id,
+                    guild_id: guild.id,
+                    address: text
+                }, { upsert: true });
+                const embed = new discord_js_1.MessageEmbed()
+                    .setTitle('Whitelist')
+                    .setDescription(`Congratulations! your address **${text}** has been added to the whitelist!`);
+                return [embed];
+            }
+            return 'Command not allowed in DMs';
         }
-        return 'Command not allowed in DMs';
+        catch (e) {
+            console.error(e);
+            return instance.messageHandler.get(guild, 'EXCEPTION');
+        }
     },
 };
 //# sourceMappingURL=whitelist.js.map

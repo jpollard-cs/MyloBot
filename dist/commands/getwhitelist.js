@@ -18,27 +18,33 @@ module.exports = {
     testOnly: true,
     callback: async (options) => {
         const { instance, guild, interaction } = options;
-        if (guild) {
-            if (!instance.isDBConnected()) {
-                return instance.messageHandler.get(guild, 'NO_DATABASE_FOUND');
+        try {
+            if (guild) {
+                if (!instance.isDBConnected()) {
+                    return instance.messageHandler.get(guild, 'NO_DATABASE_FOUND');
+                }
+                const whitelistEntries = await whitelist_model_1.default.find({
+                    guild_id: guild.id
+                });
+                const result = whitelistEntries.reduce((acc, entry) => {
+                    const { guild_id, user_id, address } = entry;
+                    return [...acc, { guild_id, user_id, address }];
+                }, []);
+                const csv = await (0, json_2_csv_1.json2csvAsync)(result);
+                await interaction.reply({
+                    files: [
+                        new discord_js_1.MessageAttachment(Buffer.from(csv), 'whitelist.csv')
+                    ],
+                    ephemeral: true
+                });
+                return;
             }
-            const whitelistEntries = await whitelist_model_1.default.find({
-                guild_id: guild.id
-            });
-            const result = whitelistEntries.reduce((acc, entry) => {
-                const { guild_id, user_id, address } = entry;
-                return [...acc, { guild_id, user_id, address }];
-            }, []);
-            const csv = await (0, json_2_csv_1.json2csvAsync)(result);
-            await interaction.reply({
-                files: [
-                    new discord_js_1.MessageAttachment(Buffer.from(csv), 'whitelist.csv')
-                ],
-                ephemeral: true
-            });
-            return;
+            return 'Command not allowed in DMs';
         }
-        return 'Command not allowed in DMs';
+        catch (e) {
+            console.error(e);
+            return instance.messageHandler.get(guild, 'EXCEPTION');
+        }
     },
 };
 //# sourceMappingURL=getwhitelist.js.map

@@ -1,6 +1,7 @@
 import { Client, Intents } from 'discord.js';
 import WOKCommands from 'wokcommands';
 import path from 'path';
+import keepAlive from './server';
 
 const client = new Client({
   // These intents are recommended for the built in help menu
@@ -24,5 +25,9 @@ client.on('ready', () => {
     mongoUri,
   });
 });
+
+// hack to keep repl.it process alive
+// see './server.ts' for more info
+keepAlive();
 
 client.login(process.env.CLIENT_TOKEN);
