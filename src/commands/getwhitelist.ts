@@ -13,7 +13,7 @@ export = {
   permissions: ['ADMINISTRATOR'],
   requireRoles: false,
   guildOnly: true,
-  testOnly: true,
+  testOnly: false,
 
   callback: async (options: ICallbackObject) => {
     const { instance, guild, interaction } = options;
@@ -30,8 +30,8 @@ export = {
         );
 
         const result = whitelistEntries.reduce((acc, entry) => {
-          const { guild_id, user_id, address } = entry;
-          return [...acc, { guild_id, user_id, address }];
+          const { guild_id, user_id, address, user_tag = '' } = entry;
+          return [...acc, { guild_id, user_id, address, user_tag  }];
         }, []);
 
         const csv = await json2csvAsync(result);

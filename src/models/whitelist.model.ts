@@ -12,6 +12,10 @@ const schema = new mongoose.Schema({
   address: {
     type: String,
     required: true,
+  },
+  user_tag: {
+    type: String,
+    required: false
   }
 });
 

@@ -31,7 +31,8 @@ module.exports = {
                 }, {
                     user_id: user.id,
                     guild_id: guild.id,
-                    address: text
+                    address: text,
+                    user_tag: user.tag
                 }, { upsert: true });
                 const embed = new discord_js_1.MessageEmbed()
                     .setTitle('Whitelist')

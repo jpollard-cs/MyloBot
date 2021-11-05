@@ -16,6 +16,10 @@ const schema = new mongoose_1.default.Schema({
     address: {
         type: String,
         required: true,
+    },
+    user_tag: {
+        type: String,
+        required: false
     }
 });
 exports.default = mongoose_1.default.model('whitelist', schema);

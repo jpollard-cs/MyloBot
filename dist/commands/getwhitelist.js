@@ -15,7 +15,7 @@ module.exports = {
     permissions: ['ADMINISTRATOR'],
     requireRoles: false,
     guildOnly: true,
-    testOnly: true,
+    testOnly: false,
     callback: async (options) => {
         const { instance, guild, interaction } = options;
         try {
@@ -27,8 +27,8 @@ module.exports = {
                     guild_id: guild.id
                 });
                 const result = whitelistEntries.reduce((acc, entry) => {
-                    const { guild_id, user_id, address } = entry;
-                    return [...acc, { guild_id, user_id, address }];
+                    const { guild_id, user_id, address, user_tag = '' } = entry;
+                    return [...acc, { guild_id, user_id, address, user_tag }];
                 }, []);
                 const csv = await (0, json_2_csv_1.json2csvAsync)(result);
                 await interaction.reply({
