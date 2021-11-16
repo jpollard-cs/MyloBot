@@ -4,55 +4,60 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 const discord_js_1 = require("discord.js");
 const luxon_1 = require("luxon");
+const ramda_1 = require("ramda");
 const custom_mylo_model_1 = __importDefault(require("../models/custom-mylo.model"));
+const validTokenRanges = [
+    ...(0, ramda_1.range)(11, 62),
+    ...(0, ramda_1.range)(1001, 1032),
+    ...(0, ramda_1.range)(4001, 4042),
+];
+const choices = validTokenRanges.map(id => {
+    return {
+        name: `${id}`,
+        value: id
+    };
+});
 module.exports = {
     description: 'Allows a user to add request customizations if they own a qualifying NFT',
     category: 'Configuration',
     name: 'custom-mylo',
-    maxArgs: 0,
+    maxArgs: 2,
+    minArgs: 2,
+    expectedArgs: '<Token ID> <ETH Address>',
     cooldown: '2s',
     slash: true,
     requireRoles: true,
     guildOnly: true,
     testOnly: false,
+    options: [{
+            name: 'token_id',
+            description: 'Your Club Mylo NFT ERC-721 Token ID',
+            required: true,
+            type: 'INTEGER',
+            choices
+        }, {
+            name: 'address',
+            description: 'The ETH/ERC-20 address where you hold this Club Mylo NFT',
+            required: true,
+            type: 'STRING'
+        }],
     callback: async (options) => {
         var _a, _b, _c;
-        const { instance, user, guild, channel, interaction, member } = options;
+        const { instance, user, guild, channel, interaction, member, args } = options;
         try {
             if (guild) {
                 if (!instance.isDBConnected()) {
                     return instance.messageHandler.get(guild, 'NO_DATABASE_FOUND');
                 }
+                const tokenId = new Number(args.shift());
+                const address = args.shift();
                 const bredoBlue = '#78bcf4';
                 const filter = m => user.id === m.author.id;
-                const numSteps = 5;
-                const addressEmbed = new discord_js_1.MessageEmbed()
-                    .setColor(bredoBlue)
-                    .setTitle(`Step 1/${numSteps}: ETH Address`)
-                    .setDescription(`Hey <@${user.id}> welcome to The 100 Club! Thank you for being an early supporter! Please tell us a bit about your custom Mylo. First let's start with your ETH address. This should be the same address where you hold your Mylo.`);
-                let message = (await interaction.reply({ embeds: [addressEmbed], fetchReply: true }));
-                const addressResponse = await channel.awaitMessages({
-                    filter, max: 1, time: 600000, errors: ['time']
-                });
-                const address = addressResponse.first().content || '';
-                addressResponse.first().delete();
-                const tokenIdEmbed = new discord_js_1.MessageEmbed()
-                    .setColor(bredoBlue)
-                    .setTitle(`Step 2/${numSteps}: Token ID`)
-                    .setDescription(`Thank you! Now please give us your token ID. If you don't know how to get this see instructions in <#909877819528581190>.`);
-                await message.edit({
-                    embeds: [tokenIdEmbed],
-                });
-                const tokenIdResponse = await channel.awaitMessages({
-                    filter, max: 1, time: 600000, errors: ['time']
-                });
-                const tokenId = tokenIdResponse.first().content || '';
-                await tokenIdResponse.first().delete();
+                const numSteps = 3;
                 const result = await custom_mylo_model_1.default
                     .findOne({ guild_id: guild.id, token_id: tokenId })
                     .exec();
                 if (result && result.user_id !== user.id) {
-                    await message.delete();
                     const errorEmbed = new discord_js_1.MessageEmbed()
                         .setColor(bredoBlue)
                         .setDescription(`<:warning:910016022654877736> It appears another user has already registered for a token with this ID **${tokenId}**. Please make sure your token ID is correct. If you believe this is in error please open a ticket through <#901106520668926003>. We apologize for the inconvenience!`);
@@ -61,11 +66,9 @@ module.exports = {
                 }
                 const customizationEmbed = new discord_js_1.MessageEmbed()
                     .setColor(bredoBlue)
-                    .setTitle(`Step 3/${numSteps}: Customizations`)
-                    .setDescription(`Please tell us, **in a single message**, a bit about the customizations you'd like. Please be as specific as possible. Don't just leave it up to our artist. Creativity is hard, there are 100 of these and our artist does not know anything about you or your preferences.`);
-                await message.edit({
-                    embeds: [customizationEmbed]
-                });
+                    .setTitle(`Step 1/${numSteps}: Customizations`)
+                    .setDescription(`:tada:910176202080276480> Hey <@${user.id}> welcome to The 100 Club! Thank you for being an early supporter! Please tell us, **in a single message**, a bit about the customizations you'd like. Please be **as specific as possible**. Don't just leave it up to our artist. Creativity is hard. There are 100 of these and while we hope to get to know we don't yet know much about you our your preferences.`);
+                let message = (await interaction.reply({ embeds: [customizationEmbed], fetchReply: true }));
                 const customizationResponse = await channel.awaitMessages({
                     filter, max: 1, time: 600000, errors: ['time']
                 });
@@ -73,7 +76,7 @@ module.exports = {
                 await customizationResponse.first().delete();
                 const image1Embed = new discord_js_1.MessageEmbed()
                     .setColor(bredoBlue)
-                    .setTitle(`[Optional] Step 4/${numSteps}: Image 1`)
+                    .setTitle(`[Optional] Step 2/${numSteps}: Image 1`)
                     .setDescription(`Got it, thank you! Do you have any images you would like to share to complement the description of your customizations? You will have the opportunity to upload 2 and they can either be a Discord upload or an image URL (please make sure the URL will not expire). Please send the first image now or reply "no" if you do not wish to add images.`);
                 await message.edit({
                     embeds: [image1Embed],
@@ -95,7 +98,7 @@ module.exports = {
                 if (image1Url) {
                     const image2Embed = new discord_js_1.MessageEmbed()
                         .setColor(bredoBlue)
-                        .setTitle(`[Optional] Step 5/${numSteps}: Image 2`)
+                        .setTitle(`[Optional] Step 3/${numSteps}: Image 2`)
                         .setDescription(`Would you like to add a second image? Please send the second one now or reply "no" if you do not wish to add a second image.`);
                     await message.edit({
                         embeds: [image2Embed],
@@ -132,7 +135,7 @@ module.exports = {
                 const finalEmbed = new discord_js_1.MessageEmbed()
                     .setColor(bredoBlue)
                     .setDescription(`<:ballot_box_with_check:910020496161128488> You're all set! We have you setup for a custom NFT with the below customizations.`)
-                    .addFields({ name: 'ETH Address', value: address }, { name: 'Token ID', value: tokenId }, { name: 'Customizations', value: customizations })
+                    .addFields({ name: 'ETH Address', value: address }, { name: 'Token ID', value: `${tokenId}` }, { name: 'Customizations', value: customizations })
                     .setTimestamp();
                 await channel.send({ embeds: [finalEmbed] });
                 if (image1Url) {

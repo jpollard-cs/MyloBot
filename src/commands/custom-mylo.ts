@@ -1,7 +1,7 @@
 import { ICallbackObject, ICommand } from 'wokcommands';
 import { MessageEmbed, Snowflake, MessageAttachment, Collection, Message } from 'discord.js';
 import { DateTime } from 'luxon';
-import { range } from 'ramda';
+import { range, contains } from 'ramda';
 import customMyloModel from '../models/custom-mylo.model';
 
 const validTokenRanges = [
@@ -9,13 +9,6 @@ const validTokenRanges = [
   ...range(1001, 1032),
   ...range(4001, 4042),
 ];
-
-const choices = validTokenRanges.map(id => {
-  return {
-    name: `${id}`,
-    value: id
-  }
-});
 
 export = {
   description: 'Allows a user to add request customizations if they own a qualifying NFT',
@@ -34,13 +27,12 @@ export = {
     description: 'Your Club Mylo NFT ERC-721 Token ID',
     required: true,
     type: 'INTEGER',
-    choices
   }, {
     name: 'address',
     description: 'The ETH/ERC-20 address where you hold this Club Mylo NFT',
     required: true,
     type: 'STRING'
-  }]
+  }],
 
   callback: async (options: ICallbackObject) => {
     const { instance, user, guild, channel, interaction, member, args } = options;
@@ -58,16 +50,23 @@ export = {
         const filter = m => user.id === m.author.id;
         const numSteps = 3;
 
+        if (!contains(tokenId, validTokenRanges)) {
+          const errorEmbed = new MessageEmbed()
+            .setColor(bredoBlue)
+            .setDescription(`<:warning:910016022654877736> Invalid token ID ${tokenId}.  Please make sure it is an integer within the ranges [11-61], [1001-10031] or [4001-4042].`);
+          await interaction.reply({ embeds: [errorEmbed] });
+          return;
+        }
+
         const result = await customMyloModel
           .findOne({ guild_id: guild.id, token_id: tokenId })
           .exec();
 
         if (result && result.user_id !== user.id) {
-          await message.delete();
           const errorEmbed = new MessageEmbed()
             .setColor(bredoBlue)
-            .setDescription(`<:warning:910016022654877736> It appears another user has already registered for a token with this ID **${tokenId}**. Please make sure your token ID is correct. If you believe this is in error please open a ticket through <#901106520668926003>. We apologize for the inconvenience!`)
-          await channel.send({ embeds: [errorEmbed] });
+            .setDescription(`<:warning:910016022654877736> It appears another user has already registered for a token with this ID **${tokenId}**. Please make sure your token ID is correct. If you believe this is in error please open a ticket through <#901106520668926003>. We apologize for the inconvenience!`);
+          await interaction.reply({ embeds: [errorEmbed] });
           return;
         }
         
@@ -163,8 +162,8 @@ export = {
           .setColor(bredoBlue)
           .setDescription(`<:ballot_box_with_check:910020496161128488> You're all set! We have you setup for a custom NFT with the below customizations.`)
           .addFields(
-            { name: 'ETH Address', value: address },
-            { name: 'Token ID', value: tokenId },
+            { name: 'ETH Address', value: '<not shared to protect your privacy>' },
+            { name: 'Token ID', value: `${tokenId}` },
             { name: 'Customizations', value: customizations },
           )
           .setTimestamp()

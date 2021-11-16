@@ -14,7 +14,7 @@ const schema = new mongoose_1.default.Schema({
         required: true,
     },
     token_id: {
-        type: String,
+        type: Number,
         required: true,
     },
     address: {
