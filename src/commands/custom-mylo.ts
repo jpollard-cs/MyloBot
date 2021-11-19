@@ -1,8 +1,8 @@
 import { ICallbackObject, ICommand } from 'wokcommands';
 import { MessageEmbed, Snowflake, MessageAttachment, Collection, Message } from 'discord.js';
 import { DateTime } from 'luxon';
-import { range, contains } from 'ramda';
-import customMyloModel from '../models/custom-mylo.model';
+import { range, includes } from 'ramda';
+import customMyloModel, { CustomMyloProcessingStatus } from '../models/custom-mylo.model';
 
 const validTokenRanges = [
   ...range(11,62),
@@ -42,7 +42,7 @@ export = {
           return instance.messageHandler.get(guild, 'NO_DATABASE_FOUND');
         }
 
-        const tokenId = new Number(args.shift());
+        const tokenId = parseInt(args.shift());
         const address = args.shift();
 
         const bredoBlue = '#78bcf4';
@@ -50,7 +50,7 @@ export = {
         const filter = m => user.id === m.author.id;
         const numSteps = 3;
 
-        if (!contains(tokenId, validTokenRanges)) {
+        if (!includes(tokenId, validTokenRanges)) {
           const errorEmbed = new MessageEmbed()
             .setColor(bredoBlue)
             .setDescription(`<:warning:910016022654877736> Invalid token ID ${tokenId}.  Please make sure it is an integer within the ranges [11-61], [1001-10031] or [4001-4042].`);
@@ -69,11 +69,19 @@ export = {
           await interaction.reply({ embeds: [errorEmbed] });
           return;
         }
+
+        if (result && result.processing_status !== CustomMyloProcessingStatus.NOT_PROCESSED) {
+          const errorEmbed = new MessageEmbed()
+            .setColor(bredoBlue)
+            .setDescription(`<:warning:910016022654877736> We're sorry, but your custom mylo is already being processed. Please reach out via a support ticket in <#901106520668926003> and we'll see what we can do.!`);
+          await interaction.reply({ embeds: [errorEmbed] });
+          return;
+        }
         
         const customizationEmbed = new MessageEmbed()
           .setColor(bredoBlue)
           .setTitle(`Step 1/${numSteps}: Customizations`)
-          .setDescription(`:tada:910176202080276480> Hey <@${user.id}> welcome to The 100 Club! Thank you for being an early supporter! Please tell us, **in a single message**, a bit about the customizations you'd like. Please be **as specific as possible**. Don't just leave it up to our artist. Creativity is hard. There are 100 of these and while we hope to get to know we don't yet know much about you our your preferences.`);
+          .setDescription(`<:tada:910176202080276480> Hey <@${user.id}> welcome to The 100 Club! Thank you for being an early supporter! Please tell us, **in a single message**, a bit about the customizations you'd like. Please be **as specific as possible**. Don't just leave it up to our artist. Creativity is hard. There are 100 of these and while we hope to get to know we don't yet know much about you our your preferences.`);
 
         let message = (await interaction.reply({ embeds: [customizationEmbed], fetchReply: true })) as Message;
 
@@ -86,12 +94,13 @@ export = {
 
         const image1Embed = new MessageEmbed()
           .setColor(bredoBlue)
-          .setTitle(`[Optional] Step 2/${numSteps}: Image 1`)
+          .setTitle(`Step 2/${numSteps}: Image 1`)
           .setDescription(`Got it, thank you! Do you have any images you would like to share to complement the description of your customizations? You will have the opportunity to upload 2 and they can either be a Discord upload or an image URL (please make sure the URL will not expire). Please send the first image now or reply "no" if you do not wish to add images.`);
 
+        await message.delete();
 
-        await message.edit({
-          embeds: [image1Embed],
+        message = await channel.send({
+          embeds: [image1Embed]
         });
 
         const image1Response = await channel.awaitMessages({
@@ -108,17 +117,17 @@ export = {
           image1Url = image1ResponseContent.trim();
         }
 
-        await image1Response.first().delete();
+        await message.delete();
 
         let image2Url;
         if (image1Url) {
           const image2Embed = new MessageEmbed()
             .setColor(bredoBlue)
-            .setTitle(`[Optional] Step 3/${numSteps}: Image 2`)
+            .setTitle(`Step 3/${numSteps}: Image 2`)
             .setDescription(`Would you like to add a second image? Please send the second one now or reply "no" if you do not wish to add a second image.`);
 
-          await message.edit({
-            embeds: [image2Embed],
+          message = await channel.send({
+            embeds: [image2Embed]
           });
 
           const image2Response = await channel.awaitMessages({
@@ -133,10 +142,8 @@ export = {
             image2Url = image2ResponseContent.trim();
           }
 
-          await image2Response.first().delete();
+          await message.delete();
         }
-
-        await message.delete();
 
         await customMyloModel.findOneAndUpdate(
           {
@@ -160,9 +167,9 @@ export = {
 
         const finalEmbed = new MessageEmbed()
           .setColor(bredoBlue)
-          .setDescription(`<:ballot_box_with_check:910020496161128488> You're all set! We have you setup for a custom NFT with the below customizations.`)
+          .setDescription(`<:ballot_box_with_check:910020496161128488> You're all set <@${user.id}>! We have you setup for a custom NFT with the below customizations.`)
           .addFields(
-            { name: 'ETH Address', value: '<not shared to protect your privacy>' },
+            { name: 'ETH Address', value: address },
             { name: 'Token ID', value: `${tokenId}` },
             { name: 'Customizations', value: customizations },
           )

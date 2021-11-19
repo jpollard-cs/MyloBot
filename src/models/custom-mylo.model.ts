@@ -1,5 +1,12 @@
 import mongoose from 'mongoose';
 
+export enum CustomMyloProcessingStatus {
+  NOT_PROCESSED = 'NOT_PROCESSED',
+  PROCESSING = 'PROCESSING',
+  ART_COMPLETE = 'ART_COMPLETE',
+  COMPLETE = 'COMPLETE'
+}
+
 const schema = new mongoose.Schema({
   guild_id: {
     type: String,
@@ -37,6 +44,11 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  processing_status: {
+    type: String,
+    required: true,
+    default: CustomMyloProcessingStatus.NOT_PROCESSED
+  }
 });
 
 export default mongoose.model('custom-mylo', schema);
