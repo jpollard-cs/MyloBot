@@ -1,7 +1,7 @@
 /* eslint-disable no-shadow */
 import { ICallbackObject, ICommand } from 'wokcommands';
 import { nanoid } from 'nanoid';
-import { MessageEmbed, Snowflake, MessageAttachment, Collection, Message, MessageActionRow, MessageSelectMenu } from 'discord.js';
+import { MessageEmbed, Snowflake, MessageAttachment, Collection, Message, MessageActionRow, MessageSelectMenu, MessageButton } from 'discord.js';
 import { DateTime } from 'luxon';
 import { range, includes } from 'ramda';
 import customMyloModel, { CustomMyloProcessingStatus } from '../models/custom-mylo.model';
@@ -244,7 +244,29 @@ Choose wisely and make sure you are happy with the backup choice.
 After completing feature selection you will be able to provide details and up to two images to assist the artist with your customizations.
           `);
 
-        await interaction.editReply({ embeds: [welcomeEmbed] });
+        const confirmationButtonId = nanoid();
+        const confirmButton = new MessageButton()
+          .setCustomId(confirmationButtonId)
+          .setLabel('I UNDERSTAND, LET\'s DO THIS!')
+          .setStyle('PRIMARY');
+
+        const confirmRow = new MessageActionRow()
+          .addComponents(
+            confirmButton
+          );
+
+        const confirmationmessage = (await interaction.editReply({ embeds: [welcomeEmbed], components: [confirmRow] })) as Message;
+
+        const confirmationFiter = i => {
+          i.deferUpdate();
+          return i.customId === confirmationButtonId && i.user.id === interaction.user.id;
+        };
+
+        const confirmationInteraction = await confirmationmessage.awaitMessageComponent({
+          filter: confirmationFiter,
+          componentType: 'BUTTON',
+          time: 60000,
+        });
 
         let customSelected = false;
         const previousSelections = [];
@@ -285,10 +307,8 @@ After completing feature selection you will be able to provide details and up to
           embeds.push(stepEmbed);
 
           const message = (await interaction.editReply({
-            // todo: replace with embed containing image for options
             embeds,
             components: [row],
-            // ephemeral: true,
           })) as Message;
 
           const filter = i => {
