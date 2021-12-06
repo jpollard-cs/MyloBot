@@ -247,7 +247,7 @@ After completing feature selection you will be able to provide details and up to
         const confirmationButtonId = nanoid();
         const confirmButton = new MessageButton()
           .setCustomId(confirmationButtonId)
-          .setLabel('I UNDERSTAND, LET\'s DO THIS!')
+          .setLabel('I UNDERSTAND, LET\'S DO THIS!')
           .setStyle('PRIMARY');
 
         const confirmRow = new MessageActionRow()
