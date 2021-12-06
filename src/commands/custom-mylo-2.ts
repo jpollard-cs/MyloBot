@@ -220,7 +220,7 @@ export = {
 
         await interaction.deferReply({ ephemeral: true });
 
-        const customizationEmbed = new MessageEmbed()
+        const welcomeEmbed = new MessageEmbed()
           .setColor(config.themeColor)
           .setTitle('Customize Your Mylo')
           .setDescription(`<:tada:910176202080276480> Hey <@${user.id}> welcome to The 100 Club!
@@ -234,18 +234,30 @@ Choose wisely and make sure you are happy with the backup choice.
 After completing feature selection you will be able to provide details and up to two images to assist the artist with your customizations.
           `);
 
-        await interaction.reply({ embeds: [customizationEmbed], ephemeral: true, fetchReply: true });
+        await interaction.editReply({ embeds: [welcomeEmbed] });
 
-        const customSelected = false;
+        let customSelected = false;
+        const previousSelections = [];
         for (const step of steps) {
           const options = step.getOption(config);
-          const optionValues = options.values?.map(v => ({ label: v, value: v }));
+          const optionValues = options.values.map(v => ({ label: v, value: v }));
           if (options.supportsNone) {
             optionValues.push({ label: noneValue, value: noneValue });
           }
           if (options.isCustomizable && !customSelected) {
             optionValues.push({ label: customValue, value: customValue });
           }
+
+          const embeds: MessageEmbed[] = [];
+
+          if (previousSelections.length) {
+            const previousSelectionsEmbed = new MessageEmbed()
+              .setColor(config.themeColor)
+              .setTitle('Previous Selections')
+              .addFields(previousSelections);
+            embeds.push(previousSelectionsEmbed);
+          }
+
           const customId = nanoid();
           const row = new MessageActionRow()
             .addComponents(
@@ -254,17 +266,18 @@ After completing feature selection you will be able to provide details and up to
                 .setPlaceholder('Nothing selected')
                 .addOptions(optionValues),
             );
-
           const stepEmbed = new MessageEmbed()
             .setColor(config.themeColor)
             .setTitle(step.getPrompt())
             .setImage(options.imageUrl);
 
-          const message = (await interaction.followUp({
+          embeds.push(stepEmbed);
+
+          const message = (await interaction.editReply({
             // todo: replace with embed containing image for options
-            embeds: [stepEmbed],
+            embeds,
             components: [row],
-            ephemeral: true,
+            // ephemeral: true,
           })) as Message;
 
           const filter = i => {
@@ -277,10 +290,27 @@ After completing feature selection you will be able to provide details and up to
             componentType: 'SELECT_MENU',
             time: 60000,
           });
-          // todo: delete select menu and move on to next step (we'll need to pass this interaction on to the next step or continue following-up to the original interaction)
-          // todo: if custom selected set customSelected to true
-          selectInteraction.reply(`You selected ${selectInteraction.values.join(', ')}!`);
+
+          const selection = selectInteraction.values[0];
+
+          if (selection === customValue) {
+            customSelected = true;
+          }
+
+          previousSelections.push({ name: step.getPrompt(), value: selection });
+
+          await interaction.editReply({
+            embeds: [embeds],
+            components: [],
+          });
         }
+
+        const customizationEmbed = new MessageEmbed()
+          .setColor(bredoBlue)
+          .setTitle(`Step 1/${numSteps}: Customizations`)
+          .setDescription(`Please tell us, **in a single message**, a bit about the customization you'd like for the item you selected as "custom". Please be **as specific as possible**. Don't just leave it up to the artist. While you are allowed to make further customization requests these are not guaranteed and are up to the artists discretion.`);
+
+        let message = (await interaction.followUp({ embeds: [customizationEmbed], ephemeral: true, fetchReply: true })) as Message;
 
         const customizationResponse = await channel.awaitMessages({
           filter, max: 1, time: 600000, errors: ['time'],
@@ -289,14 +319,14 @@ After completing feature selection you will be able to provide details and up to
         const customizations = customizationResponse.first().content || '';
         await customizationResponse.first().delete();
 
+        await message.delete();
+
         const image1Embed = new MessageEmbed()
           .setColor(config.themeColor)
           .setTitle('Image 1')
           .setDescription('Got it, thank you! Do you have any images you would like to share to complement the description of your customizations? You will have the opportunity to upload 2 and they can either be a Discord upload or an image URL (please make sure the URL will not expire). Please send the first image now or reply "no" if you do not wish to add images.');
-
-        // await message.delete();
-
-        let message = await channel.send({
+          
+        message = await channel.send({
           embeds: [image1Embed],
         });
 
