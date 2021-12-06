@@ -358,9 +358,7 @@ After completing feature selection you will be able to provide details and up to
             .setTitle('Image 2`')
             .setDescription('Would you like to add a second image? Please send the second one now or reply "no" if you do not wish to add a second image.');
 
-
           await interaction.followUp({ embeds: [image2Embed], ephemeral: true, fetchReply: true });
-
 
           const image2Response = await channel.awaitMessages({
             filter, max: 1, time: 600000, errors: ['time'],
@@ -392,7 +390,7 @@ After completing feature selection you will be able to provide details and up to
             customizations,
             imageUrls: [image1Url, image2Url],
             updatedDateTimeUtc: DateTime.now().toISO(),
-            configuration: 
+            configuration: previousSelections,
           },
           { upsert: true },
         );

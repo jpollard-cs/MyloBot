@@ -9,6 +9,17 @@ export enum CustomMyloProcessingStatus {
   COMPLETE = 'COMPLETE'
 }
 
+const configSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  value: {
+    type: String,
+    required: true,
+  },
+});
+
 const schema = new mongoose.Schema({
   guild_id: {
     type: String,
@@ -50,6 +61,15 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
     default: CustomMyloProcessingStatus.NOT_PROCESSED,
+  },
+  configuration: {
+    type: [configSchema],
+    required: true,
+  },
+  schema_version: {
+    type: String,
+    required: true,
+    default: '2',
   },
 });
 
