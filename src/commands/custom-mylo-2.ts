@@ -38,12 +38,14 @@ const validTokenRanges = [
 ];
 
 interface CustomMyloStep {
+  displayName: string;
   getPrompt: () => string;
   getOption: (config: ICustomMylo) => ICustomMyloOptions
 }
 
 const steps: CustomMyloStep[] = [
   {
+    displayName: 'background',
     getPrompt: () => {
       return 'please select your background color';
     },
@@ -51,6 +53,7 @@ const steps: CustomMyloStep[] = [
       return config.backgrounds;
     },
   }, {
+    displayName: 'body type',
     getPrompt: () => {
       return 'please select the body type';
     },
@@ -58,6 +61,7 @@ const steps: CustomMyloStep[] = [
       return config.body;
     },
   }, {
+    displayName: 'clothing',
     getPrompt: () => {
       return 'please select clothing';
     },
@@ -65,6 +69,7 @@ const steps: CustomMyloStep[] = [
       return config.clothes;
     },
   }, {
+    displayName: 'eyes',
     getPrompt: () => {
       return 'please select the eyes';
     },
@@ -72,6 +77,7 @@ const steps: CustomMyloStep[] = [
       return config.eyes;
     },
   }, {
+    displayName: 'facial feature',
     getPrompt: () => {
       return 'please select a facial feature';
     },
@@ -79,6 +85,7 @@ const steps: CustomMyloStep[] = [
       return config.face;
     },
   }, {
+    displayName: 'hat',
     getPrompt: () => {
       return 'please select a hat';
     },
@@ -86,6 +93,7 @@ const steps: CustomMyloStep[] = [
       return config.hats;
     },
   }, {
+    displayName: 'jewlery',
     getPrompt: () => {
       return 'please select jewlery';
     },
@@ -93,6 +101,7 @@ const steps: CustomMyloStep[] = [
       return config.jewlery;
     },
   }, {
+    displayName: 'mouth',
     getPrompt: () => {
       return 'please select the mouth';
     },
@@ -100,6 +109,7 @@ const steps: CustomMyloStep[] = [
       return config.mouth;
     },
   }, {
+    displayName: 'tail',
     getPrompt: () => {
       return 'please select a tail';
     },
@@ -297,7 +307,7 @@ After completing feature selection you will be able to provide details and up to
             customSelected = true;
           }
 
-          previousSelections.push({ name: step.getPrompt(), value: selection });
+          previousSelections.push({ name: step.displayName, value: selection });
 
           await interaction.editReply({
             embeds: embeds,
@@ -390,6 +400,7 @@ After completing feature selection you will be able to provide details and up to
             customizations,
             imageUrls: [image1Url, image2Url],
             updatedDateTimeUtc: DateTime.now().toISO(),
+            configuration: 
           },
           { upsert: true },
         );
@@ -400,7 +411,8 @@ After completing feature selection you will be able to provide details and up to
           .addFields(
             { name: 'ETH Address', value: address },
             { name: 'Token ID', value: `${tokenId}` },
-            { name: 'Customizations', value: customizations },
+            ...previousSelections,
+            { name: 'Customization Details', value: customizations },
           )
           .setTimestamp();
 
