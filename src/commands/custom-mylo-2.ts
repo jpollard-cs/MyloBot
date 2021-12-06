@@ -310,7 +310,7 @@ After completing feature selection you will be able to provide details and up to
           .setTitle('Customization Details')
           .setDescription('Please tell us, **in a single message**, a bit about the customization you\'d like for the item you selected as "custom". Please be **as specific as possible**. Don\'t just leave it up to the artist. While you are allowed to make further customization requests these are not guaranteed and are up to the artists discretion.');
 
-        let message = (await interaction.followUp({ embeds: [customizationEmbed], ephemeral: true, fetchReply: true })) as Message;
+        await interaction.followUp({ embeds: [customizationEmbed], ephemeral: true, fetchReply: true });
 
         const customizationResponse = await channel.awaitMessages({
           filter, max: 1, time: 600000, errors: ['time'],
@@ -319,16 +319,12 @@ After completing feature selection you will be able to provide details and up to
         const customizations = customizationResponse.first().content || '';
         await customizationResponse.first().delete();
 
-        await message.delete();
-
         const image1Embed = new MessageEmbed()
           .setColor(config.themeColor)
           .setTitle('Image 1')
           .setDescription('Got it, thank you! Do you have any images you would like to share to complement the description of your customizations? You will have the opportunity to upload 2 and they can either be a Discord upload or an image URL (please make sure the URL will not expire). Please send the first image now or reply "no" if you do not wish to add images.');
 
-        message = await channel.send({
-          embeds: [image1Embed],
-        });
+        await interaction.followUp({ embeds: [image1Embed], ephemeral: true, fetchReply: true });
 
         const image1Response = await channel.awaitMessages({
           filter, max: 1, time: 600000, errors: ['time'],
@@ -345,8 +341,6 @@ After completing feature selection you will be able to provide details and up to
           image1Url = image1ResponseContent.trim();
         }
 
-        await message.delete();
-
         let image2Url;
         if (image1Url) {
           const image2Embed = new MessageEmbed()
@@ -354,9 +348,9 @@ After completing feature selection you will be able to provide details and up to
             .setTitle('Image 2`')
             .setDescription('Would you like to add a second image? Please send the second one now or reply "no" if you do not wish to add a second image.');
 
-          message = await channel.send({
-            embeds: [image2Embed],
-          });
+
+          await interaction.followUp({ embeds: [image2Embed], ephemeral: true, fetchReply: true });
+
 
           const image2Response = await channel.awaitMessages({
             filter, max: 1, time: 600000, errors: ['time'],
@@ -370,8 +364,6 @@ After completing feature selection you will be able to provide details and up to
           else if (image2ResponseContent && image2ResponseContent.trim().toLowerCase() !== 'no') {
             image2Url = image2ResponseContent.trim();
           }
-
-          await message.delete();
         }
 
         await customMyloModel.findOneAndUpdate(
