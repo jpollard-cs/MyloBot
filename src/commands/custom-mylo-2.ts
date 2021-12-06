@@ -262,7 +262,7 @@ After completing feature selection you will be able to provide details and up to
           return i.customId === confirmationButtonId && i.user.id === interaction.user.id;
         };
 
-        const confirmationInteraction = await confirmationmessage.awaitMessageComponent({
+        await confirmationmessage.awaitMessageComponent({
           filter: confirmationFiter,
           componentType: 'BUTTON',
           time: 60000,
