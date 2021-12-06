@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "npm run build:ts && node dist/index.js",
+    "start": "rm -rf ./dist && npm run build:ts && node dist/index.js",
     "build:ts": "tsc -p .tsconfig"
   },
   "keywords": [],
@@ -20,6 +20,7 @@
     "json-2-csv": "^3.14.4",
     "luxon": "^2.1.1",
     "mongoose": "^6.0.12",
+    "nanoid": "^3.1.30",
     "node-fetch": "^2.6.6",
     "ramda": "^0.27.1",
     "wokcommands": "^1.5.3"

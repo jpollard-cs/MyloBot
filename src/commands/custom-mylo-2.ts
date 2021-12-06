@@ -1,4 +1,5 @@
 import { ICallbackObject, ICommand } from 'wokcommands';
+import { nanoid } from 'nanoid';
 import { MessageEmbed, Snowflake, MessageAttachment, Collection, Message } from 'discord.js';
 import { DateTime } from 'luxon';
 import { range, includes } from 'ramda';
@@ -41,75 +42,77 @@ interface CustomMyloStep {
   getOption: (config: ICustomMylo) => ICustomMyloOptions
 }
 
-const steps: CustomMyloStep[]  = [{
-  getPrompt: () => {
-    return `please select your background color`;
-  },
-  getOption: (config: ICustomMylo) => {
-    return config.backgrounds;
+const steps: CustomMyloStep[]  = [
+  {
+    getPrompt: () => {
+      return `please select your background color`;
+    },
+    getOption: (config: ICustomMylo) => {
+      return config.backgrounds;
+    }
+  }, {
+    getPrompt: () => {
+      return `please select the body type`;
+    },
+    getOption: (config: ICustomMylo) => {
+      return config.body;
+    }
+  }, {
+    getPrompt: () => {
+      return `please select clothing`;
+    },
+    getOption: (config: ICustomMylo) => {
+      return config.clothes;
+    }
+  }, {
+    getPrompt: () => {
+      return `please select the eyes`;
+    },
+    getOption: (config: ICustomMylo) => {
+      return config.eyes;
+    }
+  }, {
+    getPrompt: () => {
+      return `please select a facial feature`;
+    },
+    getOption: (config: ICustomMylo) => {
+      return config.face;
+    }
+  }, {
+    getPrompt: () => {
+      return `please select a hat`;
+    },
+    getOption: (config: ICustomMylo) => {
+      return config.hats;
+    }
+  }, {
+    getPrompt: () => {
+      return `please select jewlery`;
+    },
+    getOption: (config: ICustomMylo) => {
+      return config.jewlery;
+    }
+  }, {
+    getPrompt: () => {
+      return `please select the mouth`;
+    },
+    getOption: (config: ICustomMylo) => {
+      return config.mouth;
+    }
+  }, {
+    getPrompt: () => {
+      return `please select a tail`;
+    },
+    getOption: (config: ICustomMylo) => {
+      return config.tail;
+    }
   }
-}, {
-  getPrompt: () => {
-    return `please select the body type`;
-  },
-  getOption: (config: ICustomMylo) => {
-    return config.body;
-  }
-}, {
-  getPrompt: () => {
-    return `please select clothing`;
-  },
-  getOption: (config: ICustomMylo) => {
-    return config.clothes;
-  }
-}, {
-  getPrompt: () => {
-    return `please select the eyes`;
-  },
-  getOption: (config: ICustomMylo) => {
-    return config.eyes;
-  }
-}, {
-  getPrompt: () => {
-    return `please select a facial feature`;
-  },
-  getOption: (config: ICustomMylo) => {
-    return config.face;
-  }
-}, {
-  getPrompt: () => {
-    return `please select a hat`;
-  },
-  getOption: (config: ICustomMylo) => {
-    return config.hats;
-  }
-}, {
-  getPrompt: () => {
-    return `please select jewlery`;
-  },
-  getOption: (config: ICustomMylo) => {
-    return config.jewlery;
-  }
-}, {
-  getPrompt: () => {
-    return `please select the mouth`;
-  },
-  getOption: (config: ICustomMylo) => {
-    return config.mouth;
-  }
-}, {
-  getPrompt: () => {
-    return `please select a tail`;
-  },
-  getOption: (config: ICustomMylo) => {
-    return config.tail;
-  }
-}];
+];
 
 export = {
   description: 'Allows a user to add request customizations if they own a qualifying NFT',
   category: 'Configuration',
-  name: 'custom-mylo-2',
+  name: 'custom-mylo',
   maxArgs: 2,
   minArgs: 2,
   expectedArgs: '<Token ID> <ETH Address>',
@@ -232,26 +235,35 @@ export = {
         let message = (await interaction.reply({ embeds: [customizationEmbed], ephemeral: true })) as Message;
 
         for (const step of steps) {
-          const options = step.getOption(config).values?.map(v => { label: v, value: v });
+          const options = step.getOption(config);
+          const optionValues = options.values?.map(v => { label: v, value: v });
+          let customId = nanoid();
           const row = new MessageActionRow()
             .addComponents(
               new MessageSelectMenu()
+                .setCustomId(customId)
                 .setPlaceholder('Nothing selected')
-                .addOptions([
-                  {
-                    label: 'Select me',
-                    description: 'This is a description',
-                    value: 'first_option',
-                  },
-                  {
-                    label: 'You can select me too',
-                    description: 'This is also a description',
-                    value: 'second_option',
-                  },
-                ]),
+                .addOptions(optionValues),
             );
 
-          await interaction.reply({ content: 'Pong!', components: [row] });
+          const message = await interaction.reply({
+            content: 'Pong!', // todo: replace with embed containing image for options
+            components: [row],
+            ephemeral: true
+          });
+          
+          const filter = i => {
+          	i.deferUpdate();
+          	return i.customId === customId && i.user.id === interaction.user.id;
+          };
+
+          const selectInteraction = await message.awaitMessageComponent({
+            filter,
+            componentType: 'SELECT_MENU',
+            time: 60000
+          });
+          // todo: delete select menu and move on to next step (we'll need to pass this interaction on to the next step or continue following-up to the original interaction)
+          interaction.reply(`You selected ${interaction.values.join(', ')}!`
         }
 
 
