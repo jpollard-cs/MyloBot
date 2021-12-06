@@ -1,7 +1,8 @@
+import { ColorResolvable } from 'discord.js';
 import { ICustomMylo } from './ICustomMylo';
 
 class CustomBredo implements ICustomMylo {
-  public readonly themeColor = '#78bcf4';
+  public readonly themeColor: ColorResolvable = '#78bcf4';
   public readonly backgrounds = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913472775182766121/unknown.png',
     values: [
@@ -20,7 +21,7 @@ class CustomBredo implements ICustomMylo {
       'classic',
     ],
     supportsNone: false,
-    isCustomizable: false
+    isCustomizable: false,
   };
   public readonly clothes = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913473233615986749/shirts.png',
@@ -43,7 +44,7 @@ class CustomBredo implements ICustomMylo {
       'panther',
     ],
     supportsNone: true,
-    isCustomizable: true
+    isCustomizable: true,
   };
   public readonly eyes = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913472995593445436/eyes.png',
@@ -66,7 +67,7 @@ class CustomBredo implements ICustomMylo {
       'pupil',
     ],
     supportsNone: false,
-    isCustomizable: true
+    isCustomizable: true,
   };
   public readonly face = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913473043374956544/face.png',
@@ -82,7 +83,7 @@ class CustomBredo implements ICustomMylo {
       'pirate',
     ],
     supportsNone: true,
-    isCustomizable: true
+    isCustomizable: true,
   };
   public readonly hats = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913473499308388414/hats.png',
@@ -96,7 +97,7 @@ class CustomBredo implements ICustomMylo {
       'teems',
     ],
     supportsNone: true,
-    isCustomizable: true
+    isCustomizable: true,
   };
   public readonly jewlery = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913473087633227886/jewlery.png',
@@ -110,7 +111,7 @@ class CustomBredo implements ICustomMylo {
       'cat_collar',
     ],
     supportsNone: true,
-    isCustomizable: true
+    isCustomizable: true,
   };
   public readonly mouth = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913473139487408199/mouth.png',
@@ -129,7 +130,7 @@ class CustomBredo implements ICustomMylo {
       'slightly_open',
     ],
     supportsNone: false,
-    isCustomizable: true
+    isCustomizable: true,
   };
   public readonly tail = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913473385114271804/tails.png',
@@ -145,7 +146,7 @@ class CustomBredo implements ICustomMylo {
       'triples',
     ],
     supportsNone: true,
-    isCustomizable: true
+    isCustomizable: true,
   };
 }
 

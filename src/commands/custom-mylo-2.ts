@@ -300,15 +300,15 @@ After completing feature selection you will be able to provide details and up to
           previousSelections.push({ name: step.getPrompt(), value: selection });
 
           await interaction.editReply({
-            embeds: [embeds],
+            embeds: embeds,
             components: [],
           });
         }
 
         const customizationEmbed = new MessageEmbed()
-          .setColor(bredoBlue)
-          .setTitle(`Customization Details`)
-          .setDescription(`Please tell us, **in a single message**, a bit about the customization you'd like for the item you selected as "custom". Please be **as specific as possible**. Don't just leave it up to the artist. While you are allowed to make further customization requests these are not guaranteed and are up to the artists discretion.`);
+          .setColor(config.themeColor)
+          .setTitle('Customization Details')
+          .setDescription('Please tell us, **in a single message**, a bit about the customization you\'d like for the item you selected as "custom". Please be **as specific as possible**. Don\'t just leave it up to the artist. While you are allowed to make further customization requests these are not guaranteed and are up to the artists discretion.');
 
         let message = (await interaction.followUp({ embeds: [customizationEmbed], ephemeral: true, fetchReply: true })) as Message;
 
@@ -325,7 +325,7 @@ After completing feature selection you will be able to provide details and up to
           .setColor(config.themeColor)
           .setTitle('Image 1')
           .setDescription('Got it, thank you! Do you have any images you would like to share to complement the description of your customizations? You will have the opportunity to upload 2 and they can either be a Discord upload or an image URL (please make sure the URL will not expire). Please send the first image now or reply "no" if you do not wish to add images.');
-          
+
         message = await channel.send({
           embeds: [image1Embed],
         });

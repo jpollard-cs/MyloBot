@@ -1,13 +1,14 @@
+import { ColorResolvable } from 'discord.js';
 import { ICustomMylo } from './ICustomMylo';
 
 class CustomRafo implements ICustomMylo {
-  public readonly themeColor = '#ed7fcd';
+  public readonly themeColor: ColorResolvable = '#ed7fcd';
   public readonly backgrounds = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913472775182766121/unknown.png',
     values: [
       'old_kiwi',
       'mylo_yellow',
-      'bredo_blue'
+      'bredo_blue',
     ],
     supportsNone: false,
     isCustomizable: false,
@@ -20,7 +21,7 @@ class CustomRafo implements ICustomMylo {
       'classic',
     ],
     supportsNone: false,
-    isCustomizable: false
+    isCustomizable: false,
   };
   public readonly clothes = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913474283739676692/shirts.png',
@@ -36,7 +37,7 @@ class CustomRafo implements ICustomMylo {
       'panther',
     ],
     supportsNone: true,
-    isCustomizable: true
+    isCustomizable: true,
   };
   public readonly eyes = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913474047495528519/eyes.png',
@@ -57,7 +58,7 @@ class CustomRafo implements ICustomMylo {
       'pupil',
     ],
     supportsNone: false,
-    isCustomizable: true
+    isCustomizable: true,
   };
   public readonly face = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913474093402173471/face.png',
@@ -72,7 +73,7 @@ class CustomRafo implements ICustomMylo {
       'boxer',
     ],
     supportsNone: true,
-    isCustomizable: true
+    isCustomizable: true,
   };
   public readonly hats = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913474175841214504/hats.png',
@@ -87,7 +88,7 @@ class CustomRafo implements ICustomMylo {
       'beanie',
     ],
     supportsNone: true,
-    isCustomizable: true
+    isCustomizable: true,
   };
   public readonly jewlery = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913474215804542976/jewlery.png',
@@ -101,7 +102,7 @@ class CustomRafo implements ICustomMylo {
       'gold_fish',
     ],
     supportsNone: true,
-    isCustomizable: true
+    isCustomizable: true,
   };
   public readonly mouth = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913474251141574776/mouths.png',
@@ -120,7 +121,7 @@ class CustomRafo implements ICustomMylo {
       'slightly_open',
     ],
     supportsNone: false,
-    isCustomizable: true
+    isCustomizable: true,
   };
   public readonly tail = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913474317176696913/tails.png',
@@ -136,7 +137,7 @@ class CustomRafo implements ICustomMylo {
       'triple',
     ],
     supportsNone: true,
-    isCustomizable: true
+    isCustomizable: true,
   };
 }
 
