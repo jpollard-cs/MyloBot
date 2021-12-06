@@ -307,7 +307,7 @@ After completing feature selection you will be able to provide details and up to
 
         const customizationEmbed = new MessageEmbed()
           .setColor(bredoBlue)
-          .setTitle(`Step 1/${numSteps}: Customizations`)
+          .setTitle(`Customization Details`)
           .setDescription(`Please tell us, **in a single message**, a bit about the customization you'd like for the item you selected as "custom". Please be **as specific as possible**. Don't just leave it up to the artist. While you are allowed to make further customization requests these are not guaranteed and are up to the artists discretion.`);
 
         let message = (await interaction.followUp({ embeds: [customizationEmbed], ephemeral: true, fetchReply: true })) as Message;

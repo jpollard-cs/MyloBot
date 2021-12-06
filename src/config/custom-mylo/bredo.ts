@@ -1,7 +1,7 @@
 import { ICustomMylo } from './ICustomMylo';
 
 class CustomBredo implements ICustomMylo {
-  public readonly themeColor: ColorResolvable = '#78bcf4';
+  public readonly themeColor = '#78bcf4';
   public readonly backgrounds = {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913472775182766121/unknown.png',
     values: [
