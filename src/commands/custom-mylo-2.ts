@@ -260,10 +260,11 @@ After completing feature selection you will be able to provide details and up to
 
           const embeds: MessageEmbed[] = [];
 
+          
           if (previousSelections.length) {
             const previousSelectionsEmbed = new MessageEmbed()
               .setColor(config.themeColor)
-              .setTitle('Previous Selections')
+              .setTitle('Selections')
               .addFields(previousSelections);
             embeds.push(previousSelectionsEmbed);
           }
@@ -310,7 +311,12 @@ After completing feature selection you will be able to provide details and up to
           previousSelections.push({ name: step.displayName, value: selection });
 
           await interaction.editReply({
-            embeds: embeds,
+            embeds: [
+              new MessageEmbed()
+                .setColor(config.themeColor)
+                .setTitle('Selections')
+                .addFields(previousSelections)
+            ],
             components: [],
           });
         }
@@ -395,31 +401,41 @@ After completing feature selection you will be able to provide details and up to
           { upsert: true },
         );
 
-        const finalEmbed = new MessageEmbed()
-          .setColor(config.themeColor)
-          .setDescription(`<:ballot_box_with_check:910020496161128488> You're all set <@${user.id}>! We have you setup for a custom NFT with the below customizations.`)
-          .addFields(
-            { name: 'ETH Address', value: address },
-            { name: 'Token ID', value: `${tokenId}` },
-            ...previousSelections,
-            { name: 'Customization Details', value: customizations },
-          )
-          .setTimestamp();
-
-        await channel.send({ embeds: [finalEmbed] });
+        const finalEmbeds = [
+          new MessageEmbed()
+            .setColor(config.themeColor)
+            .setDescription(`<:ballot_box_with_check:910020496161128488> You're all set <@${user.id}>! We have you setup for a custom NFT with the below customizations.`)
+            .addFields(
+              { name: 'ETH Address', value: address },
+              { name: 'Token ID', value: `${tokenId}` },
+              ...previousSelections,
+              { name: 'Customization Details', value: customizations },
+            )
+            .setTimestamp()
+        ];
 
         if (image1Url) {
-          await channel.send(image1Url);
+          finalEmbeds.push(
+            new MessageEmbed()
+              .setColor(config.themeColor)
+              .setImage(image1Url)
+          )
         }
 
         if (image2Url) {
-          await channel.send(image2Url);
+          finalEmbeds.push(
+            new MessageEmbed()
+              .setColor(config.themeColor)
+              .setImage(image2Url)
+          )
         }
+
+        await interaction.followUp({ embeds: finalEmbeds, ephemeral: true });
 
         const infoEmbed = new MessageEmbed()
           .setColor(config.themeColor)
           .setDescription('<:warning:910020359904956528> If there\'s an issue simply re-run this command and re-submit your information.');
-        await channel.send({ embeds: [infoEmbed] });
+        await interaction.followUp({ embeds: [infoEmbed], ephemeral: true });
 
         return;
       }
