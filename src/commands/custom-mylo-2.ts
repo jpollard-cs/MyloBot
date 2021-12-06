@@ -137,7 +137,7 @@ export = {
     const { instance, user, guild, channel, interaction, member, args } = options;
     try {
       const WARNING_RED = '#F92A3F';
-      const SUCCESS_GREEN = '#00D166';
+      // const SUCCESS_GREEN = '#00D166';
 
       if (guild) {
         if (!instance.isDBConnected()) {
@@ -188,7 +188,7 @@ export = {
 
         const { myloType, config } = getConfig(tokenId);
 
-        // const filter = m => user.id === m.author.id;
+        const filter = m => user.id === m.author.id;
 
         if (!includes(tokenId, validTokenRanges)) {
           const errorEmbed = new MessageEmbed()
@@ -236,9 +236,16 @@ After completing feature selection you will be able to provide details and up to
 
         await interaction.reply({ embeds: [customizationEmbed], ephemeral: true, fetchReply: true });
 
+        const customSelected = false;
         for (const step of steps) {
           const options = step.getOption(config);
           const optionValues = options.values?.map(v => ({ label: v, value: v }));
+          if (options.supportsNone) {
+            optionValues.push({ label: noneValue, value: noneValue });
+          }
+          if (options.isCustomizable && !customSelected) {
+            optionValues.push({ label: customValue, value: customValue });
+          }
           const customId = nanoid();
           const row = new MessageActionRow()
             .addComponents(
@@ -271,116 +278,118 @@ After completing feature selection you will be able to provide details and up to
             time: 60000,
           });
           // todo: delete select menu and move on to next step (we'll need to pass this interaction on to the next step or continue following-up to the original interaction)
+          // todo: if custom selected set customSelected to true
           selectInteraction.reply(`You selected ${selectInteraction.values.join(', ')}!`);
         }
 
+        const customizationResponse = await channel.awaitMessages({
+          filter, max: 1, time: 600000, errors: ['time'],
+        });
 
-        // const customizationResponse = await channel.awaitMessages({
-        //   filter, max: 1, time: 600000, errors: ['time'],
-        // });
+        const customizations = customizationResponse.first().content || '';
+        await customizationResponse.first().delete();
 
-        // const customizations = customizationResponse.first().content || '';
-        // await customizationResponse.first().delete();
-
-        // const image1Embed = new MessageEmbed()
-        //   .setColor(bredoBlue)
-        //   .setTitle(`Step 2/${numSteps}: Image 1`)
-        //   .setDescription(`Got it, thank you! Do you have any images you would like to share to complement the description of your customizations? You will have the opportunity to upload 2 and they can either be a Discord upload or an image URL (please make sure the URL will not expire). Please send the first image now or reply "no" if you do not wish to add images.`);
-
-        // await message.delete();
-
-        // message = await channel.send({
-        //   embeds: [image1Embed]
-        // });
-
-        // const image1Response = await channel.awaitMessages({
-        //   filter, max: 1, time: 600000, errors: ['time']
-        // });
-
-
-        // let image1Url;
-        // const image1ResponseAttachments = image1Response.first().attachments as Collection<Snowflake, MessageAttachment>;
-        // const image1ResponseContent = image1Response.first().content;
-        // if (image1ResponseAttachments.size) {
-        //   image1Url = Array.from(image1ResponseAttachments.values())[0]?.url;
-        // } else if (image1ResponseContent && image1ResponseContent.trim().toLowerCase() !== "no") {
-        //   image1Url = image1ResponseContent.trim();
-        // }
+        const image1Embed = new MessageEmbed()
+          .setColor(config.themeColor)
+          .setTitle('Image 1')
+          .setDescription('Got it, thank you! Do you have any images you would like to share to complement the description of your customizations? You will have the opportunity to upload 2 and they can either be a Discord upload or an image URL (please make sure the URL will not expire). Please send the first image now or reply "no" if you do not wish to add images.');
 
         // await message.delete();
 
-        // let image2Url;
-        // if (image1Url) {
-        //   const image2Embed = new MessageEmbed()
-        //     .setColor(bredoBlue)
-        //     .setTitle(`Step 3/${numSteps}: Image 2`)
-        //     .setDescription(`Would you like to add a second image? Please send the second one now or reply "no" if you do not wish to add a second image.`);
+        let message = await channel.send({
+          embeds: [image1Embed],
+        });
 
-        //   message = await channel.send({
-        //     embeds: [image2Embed]
-        //   });
+        const image1Response = await channel.awaitMessages({
+          filter, max: 1, time: 600000, errors: ['time'],
+        });
 
-        //   const image2Response = await channel.awaitMessages({
-        //     filter, max: 1, time: 600000, errors: ['time']
-        //   });
 
-        //   const image2ResponseAttachments = image2Response.first().attachments as Collection<Snowflake, MessageAttachment>;
-        //   const image2ResponseContent = image2Response.first().content;
-        //   if (image2ResponseAttachments.size) {
-        //     image2Url = Array.from(image2ResponseAttachments.values())[0]?.url;
-        //   } else if (image2ResponseContent && image2ResponseContent.trim().toLowerCase() !== "no") {
-        //     image2Url = image2ResponseContent.trim();
-        //   }
+        let image1Url;
+        const image1ResponseAttachments = image1Response.first().attachments as Collection<Snowflake, MessageAttachment>;
+        const image1ResponseContent = image1Response.first().content;
+        if (image1ResponseAttachments.size) {
+          image1Url = Array.from(image1ResponseAttachments.values())[0]?.url;
+        }
+        else if (image1ResponseContent && image1ResponseContent.trim().toLowerCase() !== 'no') {
+          image1Url = image1ResponseContent.trim();
+        }
 
-        //   await message.delete();
-        // }
+        await message.delete();
 
-        // await customMyloModel.findOneAndUpdate(
-        //   {
-        //     user_id: user.id,
-        //     guild_id: guild.id,
-        //     token_id: tokenId
-        //   },
-        //   {
-        //     user_id: user.id,
-        //     guild_id: guild.id,
-        //     tokenId: tokenId,
-        //     address,
-        //     user_tag: user.tag,
-        //     roleNames: Array.from(member.roles.cache?.values() || []).map(r => r.name).join(' || '),
-        //     customizations,
-        //     imageUrls: [image1Url, image2Url],
-        //     updatedDateTimeUtc: DateTime.now().toISO(),
-        //   },
-        //   { upsert: true }
-        // );
+        let image2Url;
+        if (image1Url) {
+          const image2Embed = new MessageEmbed()
+            .setColor(config.themeColor)
+            .setTitle('Image 2`')
+            .setDescription('Would you like to add a second image? Please send the second one now or reply "no" if you do not wish to add a second image.');
 
-        // const finalEmbed = new MessageEmbed()
-        //   .setColor(bredoBlue)
-        //   .setDescription(`<:ballot_box_with_check:910020496161128488> You're all set <@${user.id}>! We have you setup for a custom NFT with the below customizations.`)
-        //   .addFields(
-        //     { name: 'ETH Address', value: address },
-        //     { name: 'Token ID', value: `${tokenId}` },
-        //     { name: 'Customizations', value: customizations },
-        //   )
-        //   .setTimestamp()
+          message = await channel.send({
+            embeds: [image2Embed],
+          });
 
-        // await channel.send({ embeds: [finalEmbed] });
+          const image2Response = await channel.awaitMessages({
+            filter, max: 1, time: 600000, errors: ['time'],
+          });
 
-        // if (image1Url) {
-        //   await channel.send(image1Url);
-        // }
+          const image2ResponseAttachments = image2Response.first().attachments as Collection<Snowflake, MessageAttachment>;
+          const image2ResponseContent = image2Response.first().content;
+          if (image2ResponseAttachments.size) {
+            image2Url = Array.from(image2ResponseAttachments.values())[0]?.url;
+          }
+          else if (image2ResponseContent && image2ResponseContent.trim().toLowerCase() !== 'no') {
+            image2Url = image2ResponseContent.trim();
+          }
 
-        // if (image2Url) {
-        //   await channel.send(image2Url);
-        // }
+          await message.delete();
+        }
 
-        // const infoEmbed = new MessageEmbed()
-        //   .setColor(bredoBlue)
-        //   .setDescription(`<:warning:910020359904956528> If there's an issue simply re-run this command and re-submit your information.`)
-        // await channel.send({ embeds: [infoEmbed] });
+        await customMyloModel.findOneAndUpdate(
+          {
+            user_id: user.id,
+            guild_id: guild.id,
+            token_id: tokenId,
+          },
+          {
+            user_id: user.id,
+            guild_id: guild.id,
+            tokenId: tokenId,
+            address,
+            user_tag: user.tag,
+            roleNames: Array.from(member.roles.cache?.values() || []).map(r => r.name).join(' || '),
+            customizations,
+            imageUrls: [image1Url, image2Url],
+            updatedDateTimeUtc: DateTime.now().toISO(),
+          },
+          { upsert: true },
+        );
 
-        // return;
+        const finalEmbed = new MessageEmbed()
+          .setColor(config.themeColor)
+          .setDescription(`<:ballot_box_with_check:910020496161128488> You're all set <@${user.id}>! We have you setup for a custom NFT with the below customizations.`)
+          .addFields(
+            { name: 'ETH Address', value: address },
+            { name: 'Token ID', value: `${tokenId}` },
+            { name: 'Customizations', value: customizations },
+          )
+          .setTimestamp();
+
+        await channel.send({ embeds: [finalEmbed] });
+
+        if (image1Url) {
+          await channel.send(image1Url);
+        }
+
+        if (image2Url) {
+          await channel.send(image2Url);
+        }
+
+        const infoEmbed = new MessageEmbed()
+          .setColor(config.themeColor)
+          .setDescription('<:warning:910020359904956528> If there\'s an issue simply re-run this command and re-submit your information.');
+        await channel.send({ embeds: [infoEmbed] });
+
+        return;
       }
 
       return 'Command not allowed in DMs';
