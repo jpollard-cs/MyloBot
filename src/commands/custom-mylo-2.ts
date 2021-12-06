@@ -1,6 +1,7 @@
+/* eslint-disable no-shadow */
 import { ICallbackObject, ICommand } from 'wokcommands';
 import { nanoid } from 'nanoid';
-import { MessageEmbed, Snowflake, MessageAttachment, Collection, Message } from 'discord.js';
+import { MessageEmbed, Snowflake, MessageAttachment, Collection, Message, MessageActionRow, MessageSelectMenu } from 'discord.js';
 import { DateTime } from 'luxon';
 import { range, includes } from 'ramda';
 import customMyloModel, { CustomMyloProcessingStatus } from '../models/custom-mylo.model';
@@ -20,7 +21,7 @@ const rafoTokenIds = [
 ];
 
 const myloTokenIds = [
-  ...range(11,62),
+  ...range(11, 62),
   1002,
   1003,
   1004,
@@ -37,76 +38,75 @@ const validTokenRanges = [
 ];
 
 interface CustomMyloStep {
-  stepId: string,
   getPrompt: () => string;
   getOption: (config: ICustomMylo) => ICustomMyloOptions
 }
 
-const steps: CustomMyloStep[]  = [
+const steps: CustomMyloStep[] = [
   {
     getPrompt: () => {
-      return `please select your background color`;
+      return 'please select your background color';
     },
     getOption: (config: ICustomMylo) => {
       return config.backgrounds;
-    }
+    },
   }, {
     getPrompt: () => {
-      return `please select the body type`;
+      return 'please select the body type';
     },
     getOption: (config: ICustomMylo) => {
       return config.body;
-    }
+    },
   }, {
     getPrompt: () => {
-      return `please select clothing`;
+      return 'please select clothing';
     },
     getOption: (config: ICustomMylo) => {
       return config.clothes;
-    }
+    },
   }, {
     getPrompt: () => {
-      return `please select the eyes`;
+      return 'please select the eyes';
     },
     getOption: (config: ICustomMylo) => {
       return config.eyes;
-    }
+    },
   }, {
     getPrompt: () => {
-      return `please select a facial feature`;
+      return 'please select a facial feature';
     },
     getOption: (config: ICustomMylo) => {
       return config.face;
-    }
+    },
   }, {
     getPrompt: () => {
-      return `please select a hat`;
+      return 'please select a hat';
     },
     getOption: (config: ICustomMylo) => {
       return config.hats;
-    }
+    },
   }, {
     getPrompt: () => {
-      return `please select jewlery`;
+      return 'please select jewlery';
     },
     getOption: (config: ICustomMylo) => {
       return config.jewlery;
-    }
+    },
   }, {
     getPrompt: () => {
-      return `please select the mouth`;
+      return 'please select the mouth';
     },
     getOption: (config: ICustomMylo) => {
       return config.mouth;
-    }
+    },
   }, {
     getPrompt: () => {
-      return `please select a tail`;
+      return 'please select a tail';
     },
     getOption: (config: ICustomMylo) => {
       return config.tail;
-    }
-  }
+    },
+  },
 ];
 
 export = {
@@ -130,12 +130,15 @@ export = {
     name: 'address',
     description: 'The ETH/ERC-20 address where you hold this Club Mylo NFT',
     required: true,
-    type: 'STRING'
+    type: 'STRING',
   }],
 
   callback: async (options: ICallbackObject) => {
     const { instance, user, guild, channel, interaction, member, args } = options;
     try {
+      const WARNING_RED = '#F92A3F';
+      const SUCCESS_GREEN = '#00D166';
+
       if (guild) {
         if (!instance.isDBConnected()) {
           return instance.messageHandler.get(guild, 'NO_DATABASE_FOUND');
@@ -160,12 +163,12 @@ export = {
           MYLO = 'Mylo',
           RAFO = 'Rafo',
           BREDO = 'Bredo',
-        };
+        }
 
         const customValue = 'custom';
         const noneValue = 'none';
 
-        const getConfig = (tokenId: number): { myloType: CystomMyloType, config: ICustomMylo } => {
+        const getConfig = (tokenId: number): { myloType: CustomMyloType, config: ICustomMylo } => {
           if (isBredo(tokenId)) {
             return { myloType: CustomMyloType.BREDO, config: customBredo };
           }
@@ -179,18 +182,17 @@ export = {
           }
 
           const errorMessage = `tokenId ${tokenId} out of range`;
-          console.error(errorMessage)
-          throw new Error(errorMessage)
-        }
+          console.error(errorMessage);
+          throw new Error(errorMessage);
+        };
 
         const { myloType, config } = getConfig(tokenId);
 
-        const filter = m => user.id === m.author.id;
+        // const filter = m => user.id === m.author.id;
 
-        
         if (!includes(tokenId, validTokenRanges)) {
           const errorEmbed = new MessageEmbed()
-            .setColor(bredoBlue)
+            .setColor(WARNING_RED)
             .setDescription(`<:warning:910016022654877736> Invalid token ID ${tokenId}.  Please make sure it is an integer within the ranges [11-61], [1001-10031] or [4001-4042].`);
           await interaction.reply({ embeds: [errorEmbed] });
           return;
@@ -202,7 +204,7 @@ export = {
 
         if (result && result.user_id !== user.id) {
           const errorEmbed = new MessageEmbed()
-            .setColor(bredoBlue)
+            .setColor(WARNING_RED)
             .setDescription(`<:warning:910016022654877736> It appears another user has already registered for a token with this ID **${tokenId}**. Please make sure your token ID is correct. If you believe this is in error please open a ticket through <#901106520668926003>. We apologize for the inconvenience!`);
           await interaction.reply({ embeds: [errorEmbed] });
           return;
@@ -210,8 +212,8 @@ export = {
 
         if (result && result.processing_status !== CustomMyloProcessingStatus.NOT_PROCESSED) {
           const errorEmbed = new MessageEmbed()
-            .setColor(bredoBlue)
-            .setDescription(`<:warning:910016022654877736> We're sorry, but your custom mylo is already being processed. Please reach out via a support ticket in <#901106520668926003> and we'll see what we can do.!`);
+            .setColor(WARNING_RED)
+            .setDescription('<:warning:910016022654877736> We\'re sorry, but your custom mylo is already being processed. Please reach out via a support ticket in <#901106520668926003> and we\'ll see what we can do.!');
           await interaction.reply({ embeds: [errorEmbed] });
           return;
         }
@@ -219,25 +221,25 @@ export = {
         await interaction.deferReply({ ephemeral: true });
 
         const customizationEmbed = new MessageEmbed()
-          .setColor(bredoBlue)
-          .setTitle(`Step 1/${numSteps}: Customizations`)
+          .setColor(config.themeColor)
+          .setTitle('Customize Your Mylo')
           .setDescription(`<:tada:910176202080276480> Hey <@${user.id}> welcome to The 100 Club!
-          Thank you for being an early supporter!
-          Please tell us a bit about the customizations you'd like.
-          
-          There will be a series of ${steps.length} select menus for each of your ${myloType}'s different features.
-          You can select the "${customValue}" option **for a single feature**.
-          While you are allowed to make further customization requests these are not guaranteed and are up to the artists discretion.
-          Choose wisely and make sure you are happy with the backup choice.
-          After completing feature selection you will be able to provide details and up to two images to assist the artist with your customizations.
+Thank you for being an early supporter!
+Please tell us a bit about the customizations you'd like.
+
+There will be a series of ${steps.length} select menus for each of your ${myloType}'s different features.
+You can select the "${customValue}" option **for a single feature**.
+While you are allowed to make further customization requests these are not guaranteed and are up to the artists discretion.
+Choose wisely and make sure you are happy with the backup choice.
+After completing feature selection you will be able to provide details and up to two images to assist the artist with your customizations.
           `);
 
-        let message = (await interaction.reply({ embeds: [customizationEmbed], ephemeral: true })) as Message;
+        await interaction.reply({ embeds: [customizationEmbed], ephemeral: true, fetchReply: true });
 
         for (const step of steps) {
           const options = step.getOption(config);
-          const optionValues = options.values?.map(v => { label: v, value: v });
-          let customId = nanoid();
+          const optionValues = options.values?.map(v => ({ label: v, value: v }));
+          const customId = nanoid();
           const row = new MessageActionRow()
             .addComponents(
               new MessageSelectMenu()
@@ -246,137 +248,144 @@ export = {
                 .addOptions(optionValues),
             );
 
-          const message = await interaction.reply({
-            content: 'Pong!', // todo: replace with embed containing image for options
+          const stepEmbed = new MessageEmbed()
+            .setColor(config.themeColor)
+            .setTitle(step.getPrompt())
+            .setImage(options.imageUrl);
+
+          const message = (await interaction.followUp({
+            // todo: replace with embed containing image for options
+            embeds: [stepEmbed],
             components: [row],
-            ephemeral: true
-          });
-          
+            ephemeral: true,
+          })) as Message;
+
           const filter = i => {
-          	i.deferUpdate();
-          	return i.customId === customId && i.user.id === interaction.user.id;
+            i.deferUpdate();
+            return i.customId === customId && i.user.id === interaction.user.id;
           };
 
           const selectInteraction = await message.awaitMessageComponent({
             filter,
             componentType: 'SELECT_MENU',
-            time: 60000
+            time: 60000,
           });
           // todo: delete select menu and move on to next step (we'll need to pass this interaction on to the next step or continue following-up to the original interaction)
-          interaction.reply(`You selected ${interaction.values.join(', ')}!`
+          selectInteraction.reply(`You selected ${selectInteraction.values.join(', ')}!`);
         }
 
 
-        const customizationResponse = await channel.awaitMessages({
-          filter, max: 1, time: 600000, errors: ['time']
-        });
+        // const customizationResponse = await channel.awaitMessages({
+        //   filter, max: 1, time: 600000, errors: ['time'],
+        // });
 
-        const customizations = customizationResponse.first().content || '';
-        await customizationResponse.first().delete();
+        // const customizations = customizationResponse.first().content || '';
+        // await customizationResponse.first().delete();
 
-        const image1Embed = new MessageEmbed()
-          .setColor(bredoBlue)
-          .setTitle(`Step 2/${numSteps}: Image 1`)
-          .setDescription(`Got it, thank you! Do you have any images you would like to share to complement the description of your customizations? You will have the opportunity to upload 2 and they can either be a Discord upload or an image URL (please make sure the URL will not expire). Please send the first image now or reply "no" if you do not wish to add images.`);
+        // const image1Embed = new MessageEmbed()
+        //   .setColor(bredoBlue)
+        //   .setTitle(`Step 2/${numSteps}: Image 1`)
+        //   .setDescription(`Got it, thank you! Do you have any images you would like to share to complement the description of your customizations? You will have the opportunity to upload 2 and they can either be a Discord upload or an image URL (please make sure the URL will not expire). Please send the first image now or reply "no" if you do not wish to add images.`);
 
-        await message.delete();
+        // await message.delete();
 
-        message = await channel.send({
-          embeds: [image1Embed]
-        });
+        // message = await channel.send({
+        //   embeds: [image1Embed]
+        // });
 
-        const image1Response = await channel.awaitMessages({
-          filter, max: 1, time: 600000, errors: ['time']
-        });
+        // const image1Response = await channel.awaitMessages({
+        //   filter, max: 1, time: 600000, errors: ['time']
+        // });
 
 
-        let image1Url;
-        const image1ResponseAttachments = image1Response.first().attachments as Collection<Snowflake, MessageAttachment>;
-        const image1ResponseContent = image1Response.first().content;
-        if (image1ResponseAttachments.size) {
-          image1Url = Array.from(image1ResponseAttachments.values())[0]?.url;
-        } else if (image1ResponseContent && image1ResponseContent.trim().toLowerCase() !== "no") {
-          image1Url = image1ResponseContent.trim();
-        }
+        // let image1Url;
+        // const image1ResponseAttachments = image1Response.first().attachments as Collection<Snowflake, MessageAttachment>;
+        // const image1ResponseContent = image1Response.first().content;
+        // if (image1ResponseAttachments.size) {
+        //   image1Url = Array.from(image1ResponseAttachments.values())[0]?.url;
+        // } else if (image1ResponseContent && image1ResponseContent.trim().toLowerCase() !== "no") {
+        //   image1Url = image1ResponseContent.trim();
+        // }
 
-        await message.delete();
+        // await message.delete();
 
-        let image2Url;
-        if (image1Url) {
-          const image2Embed = new MessageEmbed()
-            .setColor(bredoBlue)
-            .setTitle(`Step 3/${numSteps}: Image 2`)
-            .setDescription(`Would you like to add a second image? Please send the second one now or reply "no" if you do not wish to add a second image.`);
+        // let image2Url;
+        // if (image1Url) {
+        //   const image2Embed = new MessageEmbed()
+        //     .setColor(bredoBlue)
+        //     .setTitle(`Step 3/${numSteps}: Image 2`)
+        //     .setDescription(`Would you like to add a second image? Please send the second one now or reply "no" if you do not wish to add a second image.`);
 
-          message = await channel.send({
-            embeds: [image2Embed]
-          });
+        //   message = await channel.send({
+        //     embeds: [image2Embed]
+        //   });
 
-          const image2Response = await channel.awaitMessages({
-            filter, max: 1, time: 600000, errors: ['time']
-          });
+        //   const image2Response = await channel.awaitMessages({
+        //     filter, max: 1, time: 600000, errors: ['time']
+        //   });
 
-          const image2ResponseAttachments = image2Response.first().attachments as Collection<Snowflake, MessageAttachment>;
-          const image2ResponseContent = image2Response.first().content;
-          if (image2ResponseAttachments.size) {
-            image2Url = Array.from(image2ResponseAttachments.values())[0]?.url;
-          } else if (image2ResponseContent && image2ResponseContent.trim().toLowerCase() !== "no") {
-            image2Url = image2ResponseContent.trim();
-          }
+        //   const image2ResponseAttachments = image2Response.first().attachments as Collection<Snowflake, MessageAttachment>;
+        //   const image2ResponseContent = image2Response.first().content;
+        //   if (image2ResponseAttachments.size) {
+        //     image2Url = Array.from(image2ResponseAttachments.values())[0]?.url;
+        //   } else if (image2ResponseContent && image2ResponseContent.trim().toLowerCase() !== "no") {
+        //     image2Url = image2ResponseContent.trim();
+        //   }
 
-          await message.delete();
-        }
+        //   await message.delete();
+        // }
 
-        await customMyloModel.findOneAndUpdate(
-          {
-            user_id: user.id,
-            guild_id: guild.id,
-            token_id: tokenId
-          },
-          {
-            user_id: user.id,
-            guild_id: guild.id,
-            tokenId: tokenId,
-            address,
-            user_tag: user.tag,
-            roleNames: Array.from(member.roles.cache?.values() || []).map(r => r.name).join(' || '),
-            customizations,
-            imageUrls: [image1Url, image2Url],
-            updatedDateTimeUtc: DateTime.now().toISO(),
-          },
-          { upsert: true }
-        );
+        // await customMyloModel.findOneAndUpdate(
+        //   {
+        //     user_id: user.id,
+        //     guild_id: guild.id,
+        //     token_id: tokenId
+        //   },
+        //   {
+        //     user_id: user.id,
+        //     guild_id: guild.id,
+        //     tokenId: tokenId,
+        //     address,
+        //     user_tag: user.tag,
+        //     roleNames: Array.from(member.roles.cache?.values() || []).map(r => r.name).join(' || '),
+        //     customizations,
+        //     imageUrls: [image1Url, image2Url],
+        //     updatedDateTimeUtc: DateTime.now().toISO(),
+        //   },
+        //   { upsert: true }
+        // );
 
-        const finalEmbed = new MessageEmbed()
-          .setColor(bredoBlue)
-          .setDescription(`<:ballot_box_with_check:910020496161128488> You're all set <@${user.id}>! We have you setup for a custom NFT with the below customizations.`)
-          .addFields(
-            { name: 'ETH Address', value: address },
-            { name: 'Token ID', value: `${tokenId}` },
-            { name: 'Customizations', value: customizations },
-          )
-          .setTimestamp()
-          
-        await channel.send({ embeds: [finalEmbed] });
-        
-        if (image1Url) {
-          await channel.send(image1Url);
-        }
+        // const finalEmbed = new MessageEmbed()
+        //   .setColor(bredoBlue)
+        //   .setDescription(`<:ballot_box_with_check:910020496161128488> You're all set <@${user.id}>! We have you setup for a custom NFT with the below customizations.`)
+        //   .addFields(
+        //     { name: 'ETH Address', value: address },
+        //     { name: 'Token ID', value: `${tokenId}` },
+        //     { name: 'Customizations', value: customizations },
+        //   )
+        //   .setTimestamp()
 
-        if (image2Url) {
-          await channel.send(image2Url);
-        }
+        // await channel.send({ embeds: [finalEmbed] });
 
-        const infoEmbed = new MessageEmbed()
-          .setColor(bredoBlue)
-          .setDescription(`<:warning:910020359904956528> If there's an issue simply re-run this command and re-submit your information.`)
-        await channel.send({ embeds: [infoEmbed] });
+        // if (image1Url) {
+        //   await channel.send(image1Url);
+        // }
 
-        return;
+        // if (image2Url) {
+        //   await channel.send(image2Url);
+        // }
+
+        // const infoEmbed = new MessageEmbed()
+        //   .setColor(bredoBlue)
+        //   .setDescription(`<:warning:910020359904956528> If there's an issue simply re-run this command and re-submit your information.`)
+        // await channel.send({ embeds: [infoEmbed] });
+
+        // return;
       }
 
       return 'Command not allowed in DMs';
-    } catch (e) {
+    }
+    catch (e) {
       console.error(e);
       // the standard message handler doesn't work properly if interaction has expired
       // so we need to do a custom response to the channel

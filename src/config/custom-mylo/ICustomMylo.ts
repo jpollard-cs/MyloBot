@@ -1,3 +1,5 @@
+import { ColorResolvable } from 'discord.js';
+
 export interface ICustomMyloOptions {
   imageUrl: string;
   values: string[];
@@ -7,7 +9,7 @@ export interface ICustomMyloOptions {
 }
 
 export interface ICustomMylo {
-  themeColor: string;
+  themeColor: ColorResolvable;
   backgrounds: ICustomMyloOptions;
   body: ICustomMyloOptions;
   clothes: ICustomMyloOptions;

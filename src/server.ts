@@ -1,10 +1,9 @@
-
 // https://replit.com/talk/learn/Hosting-discordjs-bots-on-replit-Works-for-both-discordjs-and-Eris/11027
 import express from 'express';
 
 const server = express();
 
-server.all('/', (req, res)=>{
+server.all('/', (req, res) => {
   res.send(`<!DOCTYPE html>
 <html>
 
@@ -21,12 +20,13 @@ server.all('/', (req, res)=>{
 
 </body>
 
-</html>`)
+</html>`);
 });
 
-function keepAlive(){
-  server.listen(3000, ()=>{
-    console.log("Server is Ready!")}
+function keepAlive() {
+  server.listen(3000, () => {
+    console.log('Server is Ready!');
+  },
   );
 }
 

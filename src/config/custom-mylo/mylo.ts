@@ -1,3 +1,4 @@
+import { ICustomMylo } from './ICustomMylo';
 
 class CustomMylo implements ICustomMylo {
   themeColor: '#ffdd66';
@@ -15,7 +16,7 @@ class CustomMylo implements ICustomMylo {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913473595047555092/body.png',
     values: [
       'cheese',
-      'clean'
+      'clean',
       'spikes',
       'mouse',
     ],

@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
 import mongoose from 'mongoose';
 
+// eslint-disable-next-line no-shadow
 export enum CustomMyloProcessingStatus {
   NOT_PROCESSED = 'NOT_PROCESSED',
   PROCESSING = 'PROCESSING',
@@ -26,15 +28,15 @@ const schema = new mongoose.Schema({
   },
   user_tag: {
     type: String,
-    required: true
+    required: true,
   },
   roleNames: {
     type: String,
-    required: true
+    required: true,
   },
   customizations: {
     type: String,
-    required: true
+    required: true,
   },
   imageUrls: {
     type: [String],
@@ -47,8 +49,8 @@ const schema = new mongoose.Schema({
   processing_status: {
     type: String,
     required: true,
-    default: CustomMyloProcessingStatus.NOT_PROCESSED
-  }
+    default: CustomMyloProcessingStatus.NOT_PROCESSED,
+  },
 });
 
 export default mongoose.model('custom-mylo', schema);

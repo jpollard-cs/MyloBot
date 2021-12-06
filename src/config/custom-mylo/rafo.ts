@@ -1,3 +1,4 @@
+import { ICustomMylo } from './ICustomMylo';
 
 class CustomRafo implements ICustomMylo {
   themeColor: '#ed7fcd';

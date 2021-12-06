@@ -47,7 +47,7 @@ export = {
           .find({
             guild_id: guild.id,
             $or: [{ processing_status: null }, { processing_status: CustomMyloProcessingStatus.NOT_PROCESSED }],
-            ...(userId ? { user_id: userId } : {})
+            ...(userId ? { user_id: userId } : {}),
           })
           .sort({ _id: 1 })
           .limit(100)
@@ -56,7 +56,7 @@ export = {
         if (!result || !result.length) {
           const errorEmbed = new MessageEmbed()
             .setColor(bredoBlue)
-            .setDescription(`<:warning:910016022654877736> No results found`);
+            .setDescription('<:warning:910016022654877736> No results found');
           await interaction.reply({ embeds: [errorEmbed] });
           return;
         }
@@ -66,8 +66,8 @@ export = {
         }
 
         const errorEmbed = new MessageEmbed()
-            .setColor(bredoBlue)
-            .setDescription(`${result.length} result(s) found`);
+          .setColor(bredoBlue)
+          .setDescription(`${result.length} result(s) found`);
         await interaction.reply({ embeds: [errorEmbed] });
 
         for (const mylo of result) {
@@ -78,7 +78,7 @@ export = {
               { name: 'ETH Address', value: mylo.address },
               { name: 'Token ID', value: `${mylo.token_id}` },
               { name: 'Customizations', value: mylo.customizations },
-              { name: 'User roles', value: `\`${mylo.roleNames}\``}
+              { name: 'User roles', value: `\`${mylo.roleNames}\`` },
             );
 
           await channel.send({ embeds: [customizationsEmbed] });
@@ -94,9 +94,9 @@ export = {
           return {
             updateOne: {
               filter: { _id: m._id },
-              update: { $set: { processing_status: CustomMyloProcessingStatus.PROCESSING } }
-            }
-          }
+              update: { $set: { processing_status: CustomMyloProcessingStatus.PROCESSING } },
+            },
+          };
         });
 
         await customMyloModel.bulkWrite(updates);
@@ -105,7 +105,8 @@ export = {
       }
 
       return 'Command not allowed in DMs';
-    } catch (e) {
+    }
+    catch (e) {
       console.error(e);
       return instance.messageHandler.get(guild, 'EXCEPTION');
     }

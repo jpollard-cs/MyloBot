@@ -15,8 +15,8 @@ const schema = new mongoose.Schema({
   },
   user_tag: {
     type: String,
-    required: false
-  }
+    required: false,
+  },
 });
 
 export default mongoose.model('whitelist', schema);

@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "type": "commonjs",
+  "engines": {
+    "node": "16.x",
+    "npm": "*"
+  },
   "scripts": {
     "start": "rm -rf ./dist && npm run build:ts && node dist/index.js",
     "build:ts": "tsc -p .tsconfig",
-    "lint:fix": "npm eslint --fix '**/*.js' '**/*.ts' && prettier --write '**/*.{js,ts,json,md}'"
+    "lint:fix": "eslint --fix '**/*.js' '**/*.ts' && prettier --write '**/*.{js,ts,json,md}'"
   },
   "keywords": [],
   "author": "Wiz",

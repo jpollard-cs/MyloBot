@@ -77,7 +77,7 @@
 //           await interaction.reply({ embeds: [errorEmbed] });
 //           return;
 //         }
-        
+
 //         const customizationEmbed = new MessageEmbed()
 //           .setColor(bredoBlue)
 //           .setTitle(`Step 1/${numSteps}: Customizations`)
@@ -174,9 +174,9 @@
 //             { name: 'Customizations', value: customizations },
 //           )
 //           .setTimestamp()
-          
+
 //         await channel.send({ embeds: [finalEmbed] });
-        
+
 //         if (image1Url) {
 //           await channel.send(image1Url);
 //         }

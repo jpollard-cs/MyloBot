@@ -29,26 +29,27 @@ export = {
         await whitelistModel.findOneAndUpdate(
           {
             user_id: user.id,
-            guild_id: guild.id
+            guild_id: guild.id,
           },
           {
             user_id: user.id,
             guild_id: guild.id,
             address: text,
-            user_tag: user.tag
+            user_tag: user.tag,
           },
-          { upsert: true }
+          { upsert: true },
         );
 
         const embed = new MessageEmbed()
           .setTitle('Whitelist')
-          .setDescription(`Congratulations! your address **${text}** has been added to the whitelist!`)
+          .setDescription(`Congratulations! your address **${text}** has been added to the whitelist!`);
 
-        return [embed]
+        return [embed];
       }
 
       return 'Command not allowed in DMs';
-    } catch (e) {
+    }
+    catch (e) {
       console.error(e);
       return instance.messageHandler.get(guild, 'EXCEPTION');
     }

@@ -1,8 +1,8 @@
-import { ICustomMylo, ICustomMyloOptions } from './ICustomMylo';
+import { ICustomMylo } from './ICustomMylo';
 
 class CustomBredo implements ICustomMylo {
   themeColor: '#78bcf4';
-public readonly backgrounds: {
+  public readonly backgrounds: {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913472775182766121/unknown.png',
     values: [
       'mylo_yellow',
@@ -84,7 +84,7 @@ public readonly backgrounds: {
     supportsNone: true,
     isCustomizable: true
   };
-   public readonly hats: {
+  public readonly hats: {
     imageUrl: 'https://cdn.discordapp.com/attachments/909877819528581190/913473499308388414/hats.png',
     values: [
       'afro',

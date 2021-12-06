@@ -4,7 +4,7 @@ import { range, includes } from 'ramda';
 import customMyloModel from '../models/custom-mylo.model';
 
 const validTokenRanges = [
-  ...range(11,62),
+  ...range(11, 62),
   ...range(1001, 1032),
   ...range(4001, 4042),
 ];
@@ -59,7 +59,7 @@ export = {
           await interaction.reply({ embeds: [errorEmbed] });
           return;
         }
-        
+
         const customizationsEmbed = new MessageEmbed()
           .setColor(bredoBlue)
           .setDescription(`Hey <@${user.id}>! Here are the customizations we have for you.`)
@@ -67,11 +67,11 @@ export = {
             { name: 'ETH Address', value: result.address },
             { name: 'Token ID', value: `${result.token_id}` },
             { name: 'Customizations', value: result.customizations },
-            { name: 'Last Updated', value: result.updatedDateTimeUtc }
-          )
-          
+            { name: 'Last Updated', value: result.updatedDateTimeUtc },
+          );
+
         await interaction.reply({ embeds: [customizationsEmbed] });
-        
+
         if (result.imageUrls[0]) {
           await channel.send(result.imageUrls[0]);
         }
@@ -84,7 +84,8 @@ export = {
       }
 
       return 'Command not allowed in DMs';
-    } catch (e) {
+    }
+    catch (e) {
       console.error(e);
       return instance.messageHandler.get(guild, 'EXCEPTION');
     }
