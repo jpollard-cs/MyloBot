@@ -11,10 +11,19 @@
   "author": "Wiz",
   "license": "ISC",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
+    "eslint": "^8.4.0",
+    "prettier": "^2.5.1",
     "ts-node": "^10.4.0",
     "typescript": "^4.4.4"
   },
   "dependencies": {
+    "@discordjs/builders": "^0.9.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "@types/luxon": "^2.0.7",
+    "@types/node": "^16.11.11",
+    "@types/ramda": "^0.27.59",
     "discord.js": "^13.3.1",
     "express": "^4.17.1",
     "json-2-csv": "^3.14.4",
