@@ -17,7 +17,7 @@ const rafoTokenIds = [
   1005,
   1006,
   1010,
-  range(1012, 1032),
+  ...range(1012, 1032),
 ];
 
 const myloTokenIds = [
@@ -203,7 +203,7 @@ export = {
         if (!includes(tokenId, validTokenRanges)) {
           const errorEmbed = new MessageEmbed()
             .setColor(WARNING_RED)
-            .setDescription(`<:warning:910016022654877736> Invalid token ID ${tokenId}.  Please make sure it is an integer within the ranges [11-61], [1001-10031] or [4001-4042].`);
+            .setDescription(`<:warning:910016022654877736> Invalid token ID ${tokenId}.  Please make sure it is an integer within the ranges [11-61], [1001-1031] or [4001-4042].`);
           await interaction.reply({ embeds: [errorEmbed] });
           return;
         }
