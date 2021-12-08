@@ -4,8 +4,12 @@ import path from 'path';
 import keepAlive from './server';
 
 const client = new Client({
-  // These intents are recommended for the built in help menu
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
+  intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    Intents.FLAGS.GUILD_BANS,
+  ],
 });
 
 const dbPassword = process.env.MONGO_PASSWORD;
@@ -17,8 +21,9 @@ const mongoUri = `mongodb+srv://${dbUsername}:${dbPassword}@${dbHost}/${dbName}?
 client.on('ready', () => {
   new WOKCommands(client, {
     // The name of the local folder for your command files
-
     commandDir: path.join(__dirname, 'commands'),
+    // The name of the local folder for your feature files
+    featureDir: path.join(__dirname, 'features'),
     // Allow importing of .ts files if you are using ts-node
     typeScript: false,
     testServers: [process.env.TEST_GUILD_ID],
